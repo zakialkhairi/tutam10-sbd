@@ -11,7 +11,7 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     const newWorkspace: Workspace = {
-      id: Math.random().toString(36).substr(2, 9),
+      id: crypto.randomUUID(),
       name: body.name || 'New Workspace',
       schedules: [],
       createdAt: Date.now(),

@@ -47,6 +47,9 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name }),
     });
+    
+    if (!res.ok) throw new Error('Failed to create workspace');
+    
     const newWorkspace = await res.json();
     setWorkspaces((prev) => [...prev, newWorkspace]);
     return newWorkspace;
@@ -79,21 +82,28 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
   };
 
   const addSchedule = async (workspaceId: string, scheduleData: Omit<Schedule, 'id'>) => {
-    const res = await fetch(`/api/workspaces/${workspaceId}/schedules`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(scheduleData),
-    });
-    const newSchedule = await res.json();
+    try {
+      const res = await fetch(`/api/workspaces/${workspaceId}/schedules`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(scheduleData),
+      });
+      
+      if (!res.ok) throw new Error('Failed to add schedule');
+      
+      const newSchedule = await res.json();
 
-    setWorkspaces((prev) =>
-      prev.map((w) => {
-        if (w.id === workspaceId) {
-          return { ...w, schedules: [...w.schedules, newSchedule] };
-        }
-        return w;
-      })
-    );
+      setWorkspaces((prev) =>
+        prev.map((w) => {
+          if (w.id === workspaceId) {
+            return { ...w, schedules: [...w.schedules, newSchedule] };
+          }
+          return w;
+        })
+      );
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const updateSchedule = async (workspaceId: string, updatedSchedule: Schedule) => {

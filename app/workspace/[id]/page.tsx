@@ -117,7 +117,7 @@ export default function WorkspacePage({ params }: { params: Promise<{ id: string
         )}
 
         <AnimatePresence mode='popLayout'>
-          {workspace.schedules.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()).map((task) => (
+          {[...workspace.schedules].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()).map((task) => (
             <motion.div
               key={task.id}
               layout

@@ -33,7 +33,7 @@ export async function POST(
 
     const newSchedule: Schedule = {
       ...body,
-      id: Math.random().toString(36).substr(2, 9),
+      id: crypto.randomUUID(),
     };
 
     workspaces[workspaceIndex].schedules.push(newSchedule);
