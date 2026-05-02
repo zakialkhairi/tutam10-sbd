@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getWorkspaces, saveWorkspaces } from '@/lib/data';
+
+export const dynamic = 'force-dynamic';
 import { Schedule } from '@/types';
 
 export async function GET(

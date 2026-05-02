@@ -40,5 +40,19 @@
       }
     ],
     "createdAt": 1777741597568
+  },
+  {
+    "id": "2faf4e00-e18e-405b-aacc-6d910433c15a",
+    "name": "Persistence Test",
+    "schedules": [
+      {
+        "name": "Task Persistent",
+        "status": "To Do",
+        "date": "2026-05-02",
+        "description": "",
+        "id": "e7756928-6c9e-440e-b31b-9934036bd9a1"
+      }
+    ],
+    "createdAt": 1777742422993
   }
 ]
