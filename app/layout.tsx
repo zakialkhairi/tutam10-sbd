@@ -19,6 +19,9 @@ const fraunces = Fraunces({
 export const metadata: Metadata = {
   title: "Schedulium",
   description: "Manage your tasks in isolated workspaces with a premium interactive experience.",
+  icons: {
+    icon: '/images/logo.png',
+  },
 };
 
 export default function RootLayout({

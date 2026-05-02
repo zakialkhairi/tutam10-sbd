@@ -239,9 +239,9 @@ export default function WorkspacePage({ params }: { params: Promise<{ id: string
                       }
                       className="w-full bg-foreground/5 border border-border rounded-xl p-4 font-bold focus:outline-none"
                     >
-                      <option value="To Do">To Do</option>
-                      <option value="In Progress">In Progress</option>
-                      <option value="Done">Done</option>
+                      <option value="To Do" className="text-black">To Do</option>
+                      <option value="In Progress" className="text-black">In Progress</option>
+                      <option value="Done" className="text-black">Done</option>
                     </select>
                   </div>
                   <div>

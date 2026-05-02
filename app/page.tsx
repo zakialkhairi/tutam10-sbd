@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, ArrowRight, Sparkles } from 'lucide-react';
+import { Plus, ArrowRight, Box, HardDrive, Lock } from 'lucide-react';
 import { useWorkspaces } from '@/context/WorkspaceContext';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -92,15 +92,21 @@ export default function HomePage() {
 
         <div className="mt-12 flex items-center justify-center gap-8 opacity-40 grayscale hover:grayscale-0 transition-all duration-500">
           <div className="flex flex-col items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-foreground/20" />
+            <div className="w-8 h-8 rounded-lg bg-foreground/10 flex items-center justify-center">
+              <Box className="w-4 h-4" />
+            </div>
             <span className="text-[10px] font-bold uppercase tracking-widest">Isolated</span>
           </div>
           <div className="flex flex-col items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-foreground/20" />
+            <div className="w-8 h-8 rounded-lg bg-foreground/10 flex items-center justify-center">
+              <HardDrive className="w-4 h-4" />
+            </div>
             <span className="text-[10px] font-bold uppercase tracking-widest">Local</span>
           </div>
           <div className="flex flex-col items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-foreground/20" />
+            <div className="w-8 h-8 rounded-lg bg-foreground/10 flex items-center justify-center">
+              <Lock className="w-4 h-4" />
+            </div>
             <span className="text-[10px] font-bold uppercase tracking-widest">Private</span>
           </div>
         </div>
