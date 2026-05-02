@@ -13,17 +13,22 @@ export default function HomePage() {
   const [workspaceName, setWorkspaceName] = useState('');
   const [isCreating, setIsCreating] = useState(false);
 
-  const handleCreate = (e?: React.FormEvent) => {
+  const handleCreate = async (e?: React.FormEvent) => {
     e?.preventDefault();
     if (!workspaceName.trim()) return;
 
     setIsCreating(true);
-    const newWs = createWorkspace(workspaceName);
-
-    // Smooth transition
-    setTimeout(() => {
-      router.push(`/workspace/${newWs.id}`);
-    }, 600);
+    try {
+      const newWs = await createWorkspace(workspaceName);
+      
+      // Smooth transition
+      setTimeout(() => {
+        router.push(`/workspace/${newWs.id}`);
+      }, 600);
+    } catch (error) {
+      setIsCreating(false);
+      console.error("Failed to create workspace", error);
+    }
   };
 
   return (

@@ -21,7 +21,7 @@ import { Schedule, TaskStatus } from '@/types';
 
 export default function WorkspacePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const { workspaces, updateWorkspace, addSchedule, updateSchedule, deleteSchedule } = useWorkspaces();
+  const { workspaces, isLoading, updateWorkspace, addSchedule, updateSchedule, deleteSchedule } = useWorkspaces();
   const router = useRouter();
   
   const workspace = workspaces.find((w) => w.id === id);
@@ -34,6 +34,14 @@ export default function WorkspacePage({ params }: { params: Promise<{ id: string
     date: new Date().toISOString().split('T')[0],
     description: '',
   });
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <h2 className="text-2xl font-bold mb-4 opacity-50">Loading workspace...</h2>
+      </div>
+    );
+  }
 
   if (!workspace) {
     return (

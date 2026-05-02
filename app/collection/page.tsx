@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { cn } from '@/lib/utils';
 
 export default function CollectionPage() {
-  const { workspaces, deleteWorkspace } = useWorkspaces();
+  const { workspaces, isLoading, deleteWorkspace } = useWorkspaces();
 
   return (
     <div className="p-12 max-w-7xl mx-auto">
@@ -19,7 +19,11 @@ export default function CollectionPage() {
         </p>
       </header>
 
-      {workspaces.length === 0 ? (
+      {isLoading ? (
+        <div className="flex flex-col items-center justify-center py-32">
+          <p className="text-xl font-bold opacity-50">Loading collection...</p>
+        </div>
+      ) : workspaces.length === 0 ? (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
