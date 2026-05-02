@@ -16,10 +16,10 @@ export default function HomePage() {
   const handleCreate = (e?: React.FormEvent) => {
     e?.preventDefault();
     if (!workspaceName.trim()) return;
-    
+
     setIsCreating(true);
     const newWs = createWorkspace(workspaceName);
-    
+
     // Smooth transition
     setTimeout(() => {
       router.push(`/workspace/${newWs.id}`);
@@ -36,28 +36,21 @@ export default function HomePage() {
       >
         <div className="relative inline-block mb-8">
           <motion.div
-            animate={{ 
+            animate={{
               scale: [1, 1.05, 1],
               rotate: [0, 5, -5, 0]
             }}
             transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
           >
-            <Image 
-              src="/images/schedule.png" 
-              alt="Schedule" 
-              width={180} 
-              height={180} 
+            <Image
+              src="/images/schedule.png"
+              alt="Schedule"
+              width={180}
+              height={180}
               className="drop-shadow-2xl"
             />
           </motion.div>
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.5, type: "spring" }}
-            className="absolute -top-4 -right-4 bg-foreground text-background p-3 rounded-full shadow-xl"
-          >
-            <Sparkles className="w-6 h-6" />
-          </motion.div>
+
         </div>
 
         <h1 className="text-6xl font-header font-extrabold mb-6 tracking-tight">
@@ -96,7 +89,7 @@ export default function HomePage() {
             )}
           </button>
         </form>
-        
+
         <div className="mt-12 flex items-center justify-center gap-8 opacity-40 grayscale hover:grayscale-0 transition-all duration-500">
           <div className="flex flex-col items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-foreground/20" />

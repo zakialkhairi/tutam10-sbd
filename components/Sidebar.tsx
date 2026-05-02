@@ -4,14 +4,14 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { LayoutGrid, PlusCircle } from 'lucide-react';
+import { LayoutGrid, PlusCircle, CalendarPlus } from 'lucide-react';
 import Image from 'next/image';
 
 const navItems = [
   {
     name: 'Create Task',
     href: '/',
-    icon: '/images/schedule.png',
+    icon: <CalendarPlus className="w-6 h-6" />,
   },
   {
     name: 'Collection',
@@ -39,8 +39,8 @@ export const Sidebar = () => {
               href={item.href}
               className={cn(
                 "flex items-center gap-4 p-3 rounded-xl transition-all duration-300 group",
-                isActive 
-                  ? "bg-foreground text-background scale-105 shadow-md" 
+                isActive
+                  ? "bg-foreground text-background scale-105 shadow-md"
                   : "hover:bg-foreground/5"
               )}
             >
@@ -49,7 +49,7 @@ export const Sidebar = () => {
                 isActive ? "scale-110" : "group-hover:scale-110"
               )}>
                 {typeof item.icon === 'string' ? (
-                  <Image src={item.icon} alt={item.name} width={24} height={24} className={cn(isActive && "invert dark:invert-0")} />
+                  <Image src={item.icon} alt={item.name} width={24} height={24} />
                 ) : (
                   item.icon
                 )}

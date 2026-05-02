@@ -30,7 +30,7 @@
   --color-border: var(--border);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
-  
+
   --font-header: 'Zodiak', serif;
   --font-text: 'Zodiak', sans-serif;
 }
