@@ -12,5 +12,33 @@
       }
     ],
     "createdAt": 1777738515561
+  },
+  {
+    "id": "9360ac98-f59d-4b73-b4e8-711e02e71bd4",
+    "name": "Bug Test",
+    "schedules": [
+      {
+        "name": "Task 1 Edited",
+        "status": "To Do",
+        "date": "2026-05-02",
+        "description": "",
+        "id": "cf0b5fd3-827d-4a69-8883-603e8b416d16"
+      },
+      {
+        "name": "Task 2",
+        "status": "To Do",
+        "date": "2026-05-02",
+        "description": "",
+        "id": "05f8f392-5972-44ac-87a4-64bc02e36e55"
+      },
+      {
+        "name": "Task 3",
+        "status": "To Do",
+        "date": "2026-05-02",
+        "description": "",
+        "id": "703f54c6-6dc1-40ad-bcd9-8cf28841d4b4"
+      }
+    ],
+    "createdAt": 1777741597568
   }
 ]
