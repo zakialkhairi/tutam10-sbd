@@ -20,7 +20,7 @@ export async function GET(
   const { id } = await params;
   const { data, error } = await supabase
     .from('workspaces')
-    .select('*, schedules(*)')
+    .select('*')
     .eq('id', id);
 
   if (error) {
@@ -53,7 +53,7 @@ export async function PUT(
       .from('workspaces')
       .update({ ...updateData })
       .eq('id', id)
-      .select('*, schedules(*)');
+      .select('*');
 
     if (error) {
       console.error("SUPABASE ERROR (PUT Workspace):", error);
@@ -77,7 +77,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  
+
   const { error } = await supabase
     .from('workspaces')
     .delete()
