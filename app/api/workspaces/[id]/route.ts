@@ -20,7 +20,7 @@ export async function GET(
   const { id } = await params;
   const { data, error } = await supabase
     .from('workspaces')
-    .select('*')
+    .select('*, schedules(*)')
     .eq('id', id);
 
   if (error) {
@@ -53,7 +53,7 @@ export async function PUT(
       .from('workspaces')
       .update({ ...updateData })
       .eq('id', id)
-      .select('*');
+      .select('*, schedules(*)');
 
     if (error) {
       console.error("SUPABASE ERROR (PUT Workspace):", error);

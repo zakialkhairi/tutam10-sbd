@@ -5,7 +5,9 @@ const sanitize = (val: string | undefined) => {
   return val.trim().replace(/^['"]|['"]$/g, '');
 };
 
-const supabaseUrl = sanitize(process.env.NEXT_PUBLIC_SUPABASE_URL).replace(/\/$/, '');
+const supabaseUrl = sanitize(process.env.NEXT_PUBLIC_SUPABASE_URL)
+  .replace(/\/$/, '')
+  .replace(/\/rest\/v1$/, '');
 const supabaseAnonKey = sanitize(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 
 if (!supabaseUrl || !supabaseAnonKey) {
