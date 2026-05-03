@@ -31,6 +31,7 @@ export async function POST(request: Request) {
     const newWorkspace = {
       id: crypto.randomUUID(),
       name: body.name || 'New Workspace',
+      createdAt: Date.now(),
     };
 
     const { data, error } = await supabase
