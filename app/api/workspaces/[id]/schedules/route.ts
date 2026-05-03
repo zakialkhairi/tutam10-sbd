@@ -11,7 +11,7 @@ export async function GET(
   const { data, error } = await supabase
     .from('schedules')
     .select('*')
-    .eq('workspace_id', id);
+    .eq('workspaces_id', id);
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -32,7 +32,7 @@ export async function POST(
     const newSchedule = {
       ...body,
       id: crypto.randomUUID(),
-      workspace_id: id,
+      workspaces_id: id,
       created_at: new Date().toISOString(),
     };
 
