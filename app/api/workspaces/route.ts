@@ -16,7 +16,7 @@ function normalizeWorkspace(workspace: any) {
 export async function GET() {
   const { data, error } = await supabase
     .from('workspaces')
-    .select('*');
+    .select('*, schedules(*)');
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
