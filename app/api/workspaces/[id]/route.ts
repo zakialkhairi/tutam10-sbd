@@ -3,6 +3,16 @@ import { supabase } from '@/lib/supabase';
 
 export const dynamic = 'force-dynamic';
 
+function normalizeWorkspace(workspace: any) {
+  return {
+    ...workspace,
+    createdAt:
+      workspace.createdAt ??
+      (workspace.created_at ? new Date(workspace.created_at).getTime() : Date.now()),
+    schedules: workspace.schedules ?? [],
+  };
+}
+
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -18,7 +28,7 @@ export async function GET(
     return NextResponse.json({ error: 'Workspace not found' }, { status: 404 });
   }
 
-  return NextResponse.json(data);
+  return NextResponse.json(normalizeWorkspace(data));
 }
 
 export async function PUT(
@@ -44,7 +54,7 @@ export async function PUT(
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    return NextResponse.json(data);
+    return NextResponse.json(normalizeWorkspace(data));
   } catch (error) {
     return NextResponse.json({ error: 'Failed to update workspace' }, { status: 500 });
   }

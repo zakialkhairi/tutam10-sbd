@@ -48,7 +48,10 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
       body: JSON.stringify({ name }),
     });
     
-    if (!res.ok) throw new Error('Failed to create workspace');
+    if (!res.ok) {
+      const errorBody = await res.json().catch(() => null);
+      throw new Error(errorBody?.error || 'Failed to create workspace');
+    }
     
     const newWorkspace = await res.json();
     setWorkspaces((prev) => [...prev, newWorkspace]);

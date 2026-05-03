@@ -3,6 +3,16 @@ import { supabase } from '@/lib/supabase';
 
 export const dynamic = 'force-dynamic';
 
+function normalizeWorkspace(workspace: any) {
+  return {
+    ...workspace,
+    createdAt:
+      workspace.createdAt ??
+      (workspace.created_at ? new Date(workspace.created_at).getTime() : Date.now()),
+    schedules: workspace.schedules ?? [],
+  };
+}
+
 export async function GET() {
   const { data, error } = await supabase
     .from('workspaces')
@@ -12,7 +22,7 @@ export async function GET() {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json(data || []);
+  return NextResponse.json((data || []).map(normalizeWorkspace));
 }
 
 export async function POST(request: Request) {
@@ -21,7 +31,6 @@ export async function POST(request: Request) {
     const newWorkspace = {
       id: crypto.randomUUID(),
       name: body.name || 'New Workspace',
-      createdAt: Date.now(),
     };
 
     const { data, error } = await supabase
@@ -34,8 +43,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    // Return with empty schedules to match Workspace type expectation
-    return NextResponse.json({ ...data, schedules: [] }, { status: 201 });
+    return NextResponse.json(normalizeWorkspace({ ...data, schedules: [] }), { status: 201 });
   } catch (error) {
     return NextResponse.json({ error: 'Failed to create workspace' }, { status: 500 });
   }
