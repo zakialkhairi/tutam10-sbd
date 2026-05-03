@@ -76,18 +76,36 @@ export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await params;
+  try {
+    const { id } = await params;
 
-  const { error } = await supabase
-    .from('workspaces')
-    .delete()
-    .eq('id', id);
+    // 1. Delete associated schedules first (Manual Cascade)
+    const { error: scheduleError } = await supabase
+      .from('schedules')
+      .delete()
+      .eq('workspaces_id', id);
 
-  if (error) {
-    console.error("SUPABASE ERROR (DELETE Workspace):", error);
+    if (scheduleError) {
+      console.error("SUPABASE ERROR (DELETE Schedules for Workspace):", scheduleError);
+      return NextResponse.json({ error: scheduleError.message }, { status: 500 });
+    }
+
+    // 2. Delete the workspace
+    const { error: workspaceError } = await supabase
+      .from('workspaces')
+      .delete()
+      .eq('id', id);
+
+    if (workspaceError) {
+      console.error("SUPABASE ERROR (DELETE Workspace):", workspaceError);
+      return NextResponse.json({ error: workspaceError.message }, { status: 500 });
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (error: any) {
+    console.error("SERVER ERROR (DELETE Workspace):", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
-
-  return NextResponse.json({ success: true });
 }
+
 
