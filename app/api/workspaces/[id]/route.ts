@@ -21,14 +21,19 @@ export async function GET(
   const { data, error } = await supabase
     .from('workspaces')
     .select('*, schedules(*)')
-    .eq('id', id)
-    .single();
+    .eq('id', id);
 
-  if (error || !data) {
+  if (error) {
+    console.error("SUPABASE ERROR (GET Workspace):", error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  const workspace = data?.[0];
+  if (!workspace) {
     return NextResponse.json({ error: 'Workspace not found' }, { status: 404 });
   }
 
-  return NextResponse.json(normalizeWorkspace(data));
+  return NextResponse.json(normalizeWorkspace(workspace));
 }
 
 export async function PUT(
@@ -38,6 +43,7 @@ export async function PUT(
   try {
     const { id } = await params;
     const body = await request.json();
+    console.log("PUT BODY:", body);
 
     // Exclude schedules from update data as they live in a separate table
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -47,15 +53,21 @@ export async function PUT(
       .from('workspaces')
       .update({ ...updateData })
       .eq('id', id)
-      .select('*, schedules(*)')
-      .single();
+      .select('*, schedules(*)');
 
     if (error) {
+      console.error("SUPABASE ERROR (PUT Workspace):", error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    return NextResponse.json(normalizeWorkspace(data));
-  } catch (error) {
+    const updated = data?.[0];
+    if (!updated) {
+      return NextResponse.json({ error: 'Workspace not found' }, { status: 404 });
+    }
+
+    return NextResponse.json(normalizeWorkspace(updated));
+  } catch (error: any) {
+    console.error("SERVER ERROR (PUT Workspace):", error);
     return NextResponse.json({ error: 'Failed to update workspace' }, { status: 500 });
   }
 }
@@ -72,8 +84,10 @@ export async function DELETE(
     .eq('id', id);
 
   if (error) {
+    console.error("SUPABASE ERROR (DELETE Workspace):", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
   return NextResponse.json({ success: true });
 }
+

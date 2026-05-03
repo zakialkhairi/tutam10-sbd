@@ -10,20 +10,28 @@ export async function PUT(
   try {
     const { scheduleId } = await params;
     const body = await request.json();
+    console.log("PUT SCHEDULE BODY:", body);
 
     const { data, error } = await supabase
       .from('schedules')
       .update({ ...body, id: scheduleId })
       .eq('id', scheduleId)
-      .select()
-      .single();
+      .select();
 
-    if (error || !data) {
+    if (error) {
+      console.error("SUPABASE ERROR (PUT Schedule):", error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    const updated = data?.[0];
+    if (!updated) {
       return NextResponse.json({ error: 'Schedule not found' }, { status: 404 });
     }
 
-    return NextResponse.json(data);
-  } catch (error) {
+    console.log("SUCCESS PUT SCHEDULE:", updated);
+    return NextResponse.json(updated);
+  } catch (error: any) {
+    console.error("SERVER ERROR (PUT Schedule):", error);
     return NextResponse.json({ error: 'Failed to update schedule' }, { status: 500 });
   }
 }
@@ -40,8 +48,10 @@ export async function DELETE(
     .eq('id', scheduleId);
 
   if (error) {
+    console.error("SUPABASE ERROR (DELETE Schedule):", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
   return new NextResponse(null, { status: 204 });
 }
+

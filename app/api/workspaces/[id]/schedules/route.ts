@@ -27,25 +27,34 @@ export async function POST(
   try {
     const { id } = await params;
     const body = await request.json();
+    console.log("POST SCHEDULE BODY:", body);
 
     const newSchedule = {
       ...body,
       id: crypto.randomUUID(),
       workspace_id: id,
+      created_at: new Date().toISOString(),
     };
+
+    console.log("INSERT SCHEDULE DATA:", newSchedule);
 
     const { data, error } = await supabase
       .from('schedules')
       .insert([newSchedule])
-      .select()
-      .single();
+      .select();
 
     if (error) {
+      console.error("SUPABASE ERROR (POST Schedule):", error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    return NextResponse.json(data, { status: 201 });
-  } catch (error) {
+    const inserted = data?.[0];
+    console.log("SUCCESS POST SCHEDULE:", inserted);
+
+    return NextResponse.json(inserted, { status: 201 });
+  } catch (error: any) {
+    console.error("SERVER ERROR (POST Schedule):", error);
     return NextResponse.json({ error: 'Failed to create schedule' }, { status: 500 });
   }
 }
+

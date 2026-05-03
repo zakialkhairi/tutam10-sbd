@@ -28,7 +28,7 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    console.log("BODY:", body); // 👈 LOG 1
+    console.log("BODY:", body);
 
     const newWorkspace = {
       id: crypto.randomUUID(),
@@ -36,31 +36,32 @@ export async function POST(request: Request) {
       created_at: new Date().toISOString(),
     };
 
-    console.log("INSERT DATA:", newWorkspace); // 👈 LOG 2
+    console.log("INSERT DATA:", newWorkspace);
 
     const { data, error } = await supabase
       .from('workspaces')
       .insert([newWorkspace])
-      .select()
-      .single();
+      .select();
 
     if (error) {
-      console.error("SUPABASE ERROR:", error); // 👈 LOG 3
+      console.error("SUPABASE ERROR:", error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    console.log("SUCCESS:", data); // 👈 LOG 4
+    const inserted = data?.[0];
+
+    console.log("SUCCESS:", inserted);
 
     return NextResponse.json(
       {
-        ...data,
-        createdAt: new Date(data.created_at).getTime(),
+        ...inserted,
+        createdAt: new Date(inserted.created_at).getTime(),
         schedules: [],
       },
       { status: 201 }
     );
   } catch (err: any) {
-    console.error("SERVER ERROR:", err); // 👈 LOG 5
+    console.error("SERVER ERROR:", err);
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
