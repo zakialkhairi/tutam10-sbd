@@ -1,15 +1,22 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const sanitize = (val: string | undefined) => {
+  if (!val) return '';
+  return val.trim().replace(/^['"]|['"]$/g, '');
+};
+
+const supabaseUrl = sanitize(process.env.NEXT_PUBLIC_SUPABASE_URL).replace(/\/$/, '');
+const supabaseAnonKey = sanitize(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 
 if (!supabaseUrl || !supabaseAnonKey) {
   console.warn(
-    'Supabase environment variables are missing! Make sure to set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in Vercel settings.'
+    'Supabase environment variables are missing or invalid! URL:',
+    supabaseUrl ? 'SET' : 'MISSING',
+    'KEY:',
+    supabaseAnonKey ? 'SET' : 'MISSING'
   );
 }
 
-export const supabase = createClient(
-  supabaseUrl || '',
-  supabaseAnonKey || ''
-);
+console.log('Initializing Supabase with URL:', supabaseUrl);
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
