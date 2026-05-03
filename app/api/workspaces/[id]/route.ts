@@ -1,22 +1,24 @@
 import { NextResponse } from 'next/server';
-import { getWorkspaces, saveWorkspaces } from '@/lib/data';
+import { supabase } from '@/lib/supabase';
 
 export const dynamic = 'force-dynamic';
-import { Workspace } from '@/types';
 
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const workspaces = getWorkspaces();
-  const workspace = workspaces.find((w) => w.id === id);
+  const { data, error } = await supabase
+    .from('workspaces')
+    .select('*, schedules(*)')
+    .eq('id', id)
+    .single();
 
-  if (!workspace) {
+  if (error || !data) {
     return NextResponse.json({ error: 'Workspace not found' }, { status: 404 });
   }
 
-  return NextResponse.json(workspace);
+  return NextResponse.json(data);
 }
 
 export async function PUT(
@@ -26,23 +28,23 @@ export async function PUT(
   try {
     const { id } = await params;
     const body = await request.json();
-    const workspaces = getWorkspaces();
-    const index = workspaces.findIndex((w) => w.id === id);
 
-    if (index === -1) {
-      return NextResponse.json({ error: 'Workspace not found' }, { status: 404 });
+    // Exclude schedules from update data as they live in a separate table
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { schedules, ...updateData } = body;
+
+    const { data, error } = await supabase
+      .from('workspaces')
+      .update({ ...updateData })
+      .eq('id', id)
+      .select('*, schedules(*)')
+      .single();
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    const updatedWorkspace: Workspace = {
-      ...workspaces[index],
-      ...body,
-      id, // ensure ID cannot be changed
-    };
-
-    workspaces[index] = updatedWorkspace;
-    saveWorkspaces(workspaces);
-
-    return NextResponse.json(updatedWorkspace);
+    return NextResponse.json(data);
   } catch (error) {
     return NextResponse.json({ error: 'Failed to update workspace' }, { status: 500 });
   }
@@ -53,13 +55,15 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const workspaces = getWorkspaces();
-  const newWorkspaces = workspaces.filter((w) => w.id !== id);
+  
+  const { error } = await supabase
+    .from('workspaces')
+    .delete()
+    .eq('id', id);
 
-  if (workspaces.length === newWorkspaces.length) {
-    return NextResponse.json({ error: 'Workspace not found' }, { status: 404 });
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  saveWorkspaces(newWorkspaces);
   return NextResponse.json({ success: true });
 }

@@ -1,22 +1,23 @@
 import { NextResponse } from 'next/server';
-import { getWorkspaces, saveWorkspaces } from '@/lib/data';
+import { supabase } from '@/lib/supabase';
 
 export const dynamic = 'force-dynamic';
-import { Schedule } from '@/types';
 
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const workspaces = getWorkspaces();
-  const workspace = workspaces.find((w) => w.id === id);
+  const { data, error } = await supabase
+    .from('schedules')
+    .select('*')
+    .eq('workspace_id', id);
 
-  if (!workspace) {
-    return NextResponse.json({ error: 'Workspace not found' }, { status: 404 });
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json(workspace.schedules);
+  return NextResponse.json(data || []);
 }
 
 export async function POST(
@@ -26,22 +27,24 @@ export async function POST(
   try {
     const { id } = await params;
     const body = await request.json();
-    const workspaces = getWorkspaces();
-    const workspaceIndex = workspaces.findIndex((w) => w.id === id);
 
-    if (workspaceIndex === -1) {
-      return NextResponse.json({ error: 'Workspace not found' }, { status: 404 });
-    }
-
-    const newSchedule: Schedule = {
+    const newSchedule = {
       ...body,
       id: crypto.randomUUID(),
+      workspace_id: id,
     };
 
-    workspaces[workspaceIndex].schedules.push(newSchedule);
-    saveWorkspaces(workspaces);
+    const { data, error } = await supabase
+      .from('schedules')
+      .insert([newSchedule])
+      .select()
+      .single();
 
-    return NextResponse.json(newSchedule, { status: 201 });
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json(data, { status: 201 });
   } catch (error) {
     return NextResponse.json({ error: 'Failed to create schedule' }, { status: 500 });
   }

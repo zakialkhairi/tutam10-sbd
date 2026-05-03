@@ -1,41 +1,28 @@
 import { NextResponse } from 'next/server';
-import { getWorkspaces, saveWorkspaces } from '@/lib/data';
+import { supabase } from '@/lib/supabase';
 
 export const dynamic = 'force-dynamic';
-import { Schedule } from '@/types';
 
 export async function PUT(
   request: Request,
   { params }: { params: Promise<{ id: string; scheduleId: string }> }
 ) {
   try {
-    const { id, scheduleId } = await params;
+    const { scheduleId } = await params;
     const body = await request.json();
-    const workspaces = getWorkspaces();
-    const workspaceIndex = workspaces.findIndex((w) => w.id === id);
 
-    if (workspaceIndex === -1) {
-      return NextResponse.json({ error: 'Workspace not found' }, { status: 404 });
-    }
+    const { data, error } = await supabase
+      .from('schedules')
+      .update({ ...body, id: scheduleId })
+      .eq('id', scheduleId)
+      .select()
+      .single();
 
-    const scheduleIndex = workspaces[workspaceIndex].schedules.findIndex(
-      (s) => s.id === scheduleId
-    );
-
-    if (scheduleIndex === -1) {
+    if (error || !data) {
       return NextResponse.json({ error: 'Schedule not found' }, { status: 404 });
     }
 
-    const updatedSchedule: Schedule = {
-      ...workspaces[workspaceIndex].schedules[scheduleIndex],
-      ...body,
-      id: scheduleId, // ensure ID cannot be changed
-    };
-
-    workspaces[workspaceIndex].schedules[scheduleIndex] = updatedSchedule;
-    saveWorkspaces(workspaces);
-
-    return NextResponse.json(updatedSchedule);
+    return NextResponse.json(data);
   } catch (error) {
     return NextResponse.json({ error: 'Failed to update schedule' }, { status: 500 });
   }
@@ -45,24 +32,16 @@ export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string; scheduleId: string }> }
 ) {
-  const { id, scheduleId } = await params;
-  const workspaces = getWorkspaces();
-  const workspaceIndex = workspaces.findIndex((w) => w.id === id);
+  const { scheduleId } = await params;
+  
+  const { error } = await supabase
+    .from('schedules')
+    .delete()
+    .eq('id', scheduleId);
 
-  if (workspaceIndex === -1) {
-    return NextResponse.json({ error: 'Workspace not found' }, { status: 404 });
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
-
-  const newSchedules = workspaces[workspaceIndex].schedules.filter(
-    (s) => s.id !== scheduleId
-  );
-
-  if (workspaces[workspaceIndex].schedules.length === newSchedules.length) {
-    return NextResponse.json({ error: 'Schedule not found' }, { status: 404 });
-  }
-
-  workspaces[workspaceIndex].schedules = newSchedules;
-  saveWorkspaces(workspaces);
 
   return new NextResponse(null, { status: 204 });
 }
