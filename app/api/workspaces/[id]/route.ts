@@ -45,9 +45,9 @@ export async function PUT(
     const body = await request.json();
     console.log("PUT BODY:", body);
 
-    // Exclude schedules from update data as they live in a separate table
+    // Exclude read-only or nested fields from update data
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { schedules, ...updateData } = body;
+    const { schedules, createdAt, created_at, id: _, ...updateData } = body;
 
     const { data, error } = await supabase
       .from('workspaces')

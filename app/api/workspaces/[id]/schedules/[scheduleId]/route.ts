@@ -12,9 +12,13 @@ export async function PUT(
     const body = await request.json();
     console.log("PUT SCHEDULE BODY:", body);
 
+    // Exclude read-only fields
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { id: _, created_at, workspaces_id, ...updateData } = body;
+
     const { data, error } = await supabase
       .from('schedules')
-      .update({ ...body, id: scheduleId })
+      .update({ ...updateData })
       .eq('id', scheduleId)
       .select();
 
