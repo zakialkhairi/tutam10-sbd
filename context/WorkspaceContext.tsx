@@ -70,18 +70,45 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
   };
 
   const deleteWorkspace = async (id: string) => {
-    // Optimistic update
-    setWorkspaces((prev) => prev.filter((w) => w.id !== id));
-    if (activeWorkspace?.id === id) {
-      setActiveWorkspace(null);
-    }
+    try {
+      console.log('Deleting workspace with ID:', id);
+      // Optimistic update
+      setWorkspaces((prev) => prev.filter((w) => w.id !== id));
+      if (activeWorkspace?.id === id) {
+        setActiveWorkspace(null);
+      }
 
-    await fetch(`/api/workspaces/${id}`, {
-      method: 'DELETE',
-    });
+      const res = await fetch(`/api/workspaces/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (!res.ok) {
+        throw new Error('Failed to delete workspace');
+      }
+    } catch (error) {
+      console.error(error);
+      // Re-fetch workspaces to sync state if delete failed
+      fetchWorkspaces();
+    }
   };
 
   const addSchedule = async (workspaceId: string, scheduleData: Omit<Schedule, 'id'>) => {
+    // Optimistic UI update
+    const optimisticId = `temp-${Date.now()}`;
+    const optimisticTask: Schedule = {
+      ...scheduleData,
+      id: optimisticId,
+    };
+
+    setWorkspaces((prev) =>
+      prev.map((w) => {
+        if (w.id === workspaceId) {
+          return { ...w, schedules: [...w.schedules, optimisticTask] };
+        }
+        return w;
+      })
+    );
+
     try {
       const res = await fetch(`/api/workspaces/${workspaceId}/schedules`, {
         method: 'POST',
@@ -93,16 +120,32 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
       
       const newSchedule = await res.json();
 
+      // Replace optimistic task with the real one from backend
       setWorkspaces((prev) =>
         prev.map((w) => {
           if (w.id === workspaceId) {
-            return { ...w, schedules: [...w.schedules, newSchedule] };
+            return {
+              ...w,
+              schedules: w.schedules.map((s) => (s.id === optimisticId ? newSchedule : s)),
+            };
           }
           return w;
         })
       );
     } catch (error) {
       console.error(error);
+      // Revert optimistic update on error
+      setWorkspaces((prev) =>
+        prev.map((w) => {
+          if (w.id === workspaceId) {
+            return {
+              ...w,
+              schedules: w.schedules.filter((s) => s.id !== optimisticId),
+            };
+          }
+          return w;
+        })
+      );
     }
   };
 

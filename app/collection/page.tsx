@@ -5,10 +5,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useWorkspaces } from '@/context/WorkspaceContext';
 import { Trash2, Calendar, ChevronRight, Folder } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 
 export default function CollectionPage() {
   const { workspaces, isLoading, deleteWorkspace } = useWorkspaces();
+  const router = useRouter();
 
   return (
     <div className="p-12 max-w-7xl mx-auto">
@@ -51,22 +53,15 @@ export default function CollectionPage() {
                 transition={{ delay: idx * 0.05 }}
                 className="group relative bg-card border border-border rounded-3xl overflow-hidden hover:shadow-2xl hover:shadow-foreground/5 transition-all duration-500"
               >
-                <div className="p-8">
+                {/* Clickable Area - Card Body */}
+                <div
+                  onClick={() => router.push(`/workspace/${ws.id}`)}
+                  className="w-full text-left p-8 cursor-pointer"
+                >
                   <div className="flex justify-between items-start mb-6">
                     <div className="w-12 h-12 rounded-2xl bg-foreground/5 flex items-center justify-center group-hover:bg-foreground group-hover:text-background transition-colors duration-300">
                       <Folder className="w-6 h-6" />
                     </div>
-                    <button
-                      onClick={(e) => {
-                        e.preventDefault();
-                        if (confirm('Are you sure you want to delete this workspace?')) {
-                          deleteWorkspace(ws.id);
-                        }
-                      }}
-                      className="p-2 opacity-0 group-hover:opacity-40 hover:!opacity-100 hover:text-red-500 transition-all"
-                    >
-                      <Trash2 className="w-5 h-5" />
-                    </button>
                   </div>
 
                   <h3 className="text-2xl font-header font-bold mb-2 group-hover:translate-x-1 transition-transform">{ws.name}</h3>
@@ -98,12 +93,19 @@ export default function CollectionPage() {
                   </div>
                 </div>
 
-                <Link 
-                  href={`/workspace/${ws.id}`}
-                  className="absolute inset-0 z-0"
-                />
-                
-                <div className="absolute bottom-4 right-8 opacity-0 group-hover:opacity-100 group-hover:translate-x-2 transition-all duration-300">
+                {/* Absolute Delete Button - Always clickable, outside the main click handler */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    deleteWorkspace(ws.id);
+                  }}
+                  className="absolute top-8 right-8 p-3 text-red-500/20 hover:text-red-500 hover:bg-red-500/5 rounded-xl transition-all z-20"
+                  title="Delete Workspace"
+                >
+                  <Trash2 className="w-5 h-5" />
+                </button>
+
+                <div className="absolute bottom-4 right-8 opacity-0 group-hover:opacity-100 group-hover:translate-x-2 transition-all duration-300 pointer-events-none">
                   <ChevronRight className="w-6 h-6" />
                 </div>
               </motion.div>

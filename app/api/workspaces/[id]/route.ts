@@ -61,5 +61,5 @@ export async function DELETE(
   }
 
   saveWorkspaces(newWorkspaces);
-  return new NextResponse(null, { status: 204 });
+  return NextResponse.json({ success: true });
 }
