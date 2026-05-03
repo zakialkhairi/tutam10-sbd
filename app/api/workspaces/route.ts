@@ -28,11 +28,15 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
+    console.log("BODY:", body); // 👈 LOG 1
+
     const newWorkspace = {
       id: crypto.randomUUID(),
       name: body.name || 'New Workspace',
-      createdAt: Date.now(),
+      created_at: new Date().toISOString(),
     };
+
+    console.log("INSERT DATA:", newWorkspace); // 👈 LOG 2
 
     const { data, error } = await supabase
       .from('workspaces')
@@ -41,11 +45,22 @@ export async function POST(request: Request) {
       .single();
 
     if (error) {
+      console.error("SUPABASE ERROR:", error); // 👈 LOG 3
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    return NextResponse.json(normalizeWorkspace({ ...data, schedules: [] }), { status: 201 });
-  } catch (error) {
-    return NextResponse.json({ error: 'Failed to create workspace' }, { status: 500 });
+    console.log("SUCCESS:", data); // 👈 LOG 4
+
+    return NextResponse.json(
+      {
+        ...data,
+        createdAt: new Date(data.created_at).getTime(),
+        schedules: [],
+      },
+      { status: 201 }
+    );
+  } catch (err: any) {
+    console.error("SERVER ERROR:", err); // 👈 LOG 5
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
